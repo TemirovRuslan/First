@@ -217,14 +217,19 @@ document.addEventListener("DOMContentLoaded", () => {
 			data.forEach(({ img, alt, title, descr, price }) => {
 				//деструктуризация  тут у нас с аргументами
 
-				new MenuCard(img, alt, title, descr, price , '.menu .container').render();
+				new MenuCard(
+					img,
+					alt,
+					title,
+					descr,
+					price,
+					".menu .container"
+				).render();
 				//вызываем констркуктор и он будет вызыватся столько раз сколько у нас обьектов придет с сервера
 			});
 		});
 
 	//*======================================= XMLHttpRequest ================= Работа с локальным сервером ==*//
-
-
 
 	const forms = document.querySelectorAll("form");
 	const message = {
@@ -340,5 +345,274 @@ document.addEventListener("DOMContentLoaded", () => {
 			//устан setTimeout тут чтоб удалить класс show
 		}, 2000);
 	}
-	//*==========================================================*//
+	//*======================================================== Slider ==*//
+
+	let offset = 0;
+	let slideIndex = 1;
+
+	const slides = document.querySelectorAll(".offer__slide"),
+		prev = document.querySelector(".offer__slider-prev"),
+		next = document.querySelector(".offer__slider-next"),
+		total = document.querySelector("#total"),
+		current = document.querySelector("#current"),
+		slidesWrapper = document.querySelector(".offer__slider-wrapper"),
+		width = window.getComputedStyle(slidesWrapper).width,
+		//получаем параметр ширины
+		slidesField = document.querySelector(".offer__slider-inner");
+
+	if (slides.length < 10) {
+		total.textContent = `0${slides.length}`;
+		current.textContent = `0${slideIndex}`;
+	} else {
+		total.textContent = slides.length;
+		current.textContent = slideIndex;
+	}
+
+	slidesField.style.width = 100 * slides.length + "%";
+	//устанавливаем ширину
+	slidesField.style.display = "flex";
+	slidesField.style.transition = "0.5s all";
+	slidesWrapper.style.overflow = "hidden";
+
+	slides.forEach((slide) => {
+		slide.style.width = width;
+	});
+
+	next.addEventListener("click", () => {
+		if (offset == +width.slice(0, width.length - 2) * (slides.length - 1)) {
+			offset = 0;
+		} else {
+			offset += +width.slice(0, width.length - 2);
+		}
+
+		slidesField.style.transform = `translateX(-${offset}px)`;
+
+		if (slideIndex == slides.length) {
+			slideIndex = 1;
+		} else {
+			slideIndex++;
+		}
+
+		if (slides.length < 10) {
+			current.textContent = `0${slideIndex}`;
+		} else {
+			current.textContent = slideIndex;
+		}
+	});
+
+	prev.addEventListener("click", () => {
+		if (offset == 0) {
+			offset = +width.slice(0, width.length - 2) * (slides.length - 1);
+		} else {
+			offset -= +width.slice(0, width.length - 2);
+		}
+
+		slidesField.style.transform = `translateX(-${offset}px)`;
+
+		if (slideIndex == 1) {
+			slideIndex = slides.length;
+		} else {
+			slideIndex--;
+		}
+
+		if (slides.length < 10) {
+			current.textContent = `0${slideIndex}`;
+		} else {
+			current.textContent = slideIndex;
+		}
+	});
+
+	/* let slideIndex = 1;
+	//номер слайда
+	
+	
+	// логика для вставки нолика перед цифрой
+	if(slides.length < 10 ){
+		total.textContent = `0${slides.length}`;
+	}else{
+		total.textContent = `${slides.length}`;
+	}
+	
+	function sliderShow(n){
+		//показывает и скрывает изображение
+		if(n > slides.length){
+			slideIndex = 1;
+		}
+		//если пол перешел за последний слад, то возвращяет к первому обратно
+		if(n < 1){
+			slideIndex = slides.length;
+		}
+		//тут наоборот
+
+		slides.forEach((item) => {
+			item.style.display = 'none';
+		});// убираем дипсплей со всех элементов
+
+		slides[slideIndex - 1].style.display = 'block';
+		
+		// логика для вставки нолика перед цифрой
+		if(slides.length < 10 ){
+			current.textContent = `0${slideIndex}`;
+		}else{ 
+			current.textContent = `${slideIndex}`;
+		}
+	}
+	sliderShow(slideIndex);
+
+
+
+	function plusSlide(n){
+		sliderShow(slideIndex += n);
+		// функция которая складывает или вычитает
+	}
+
+	prev.addEventListener('click', () => {
+		plusSlide(-1);
+	});
+	next.addEventListener('click', () => {
+		plusSlide(+1);
+	}); */
+
+	//*======================================================== Calculator ==*//
+
+	const result = document.querySelector(".calculating__result span");
+
+	let sex, height, weight, age, ratio;
+
+
+	if (localStorage.getItem("sex")) {
+		sex = localStorage.getItem("sex");
+	} else {
+		sex = "female";
+		localStorage.setItem("sex", "female");
+	} // уст значние по умолчанию переменной sex в localStorage
+
+
+	if (localStorage.getItem("ratio")) {
+		ratio = localStorage.getItem("ratio");
+	} else {
+		ratio = 1.375;
+		localStorage.setItem("ratio", 1.375);
+	} // уст значние по умолчанию переменной ratio в localStorage
+
+
+	//ф считатет каллории и выводит результат на страницу
+	function calcTotal() {
+		if (!sex || !height || !weight || !age || !ratio) {
+			result.textContent = "____";
+			// если одно из переменных не заполненно или выбрано то даем этот результат
+			return;
+			//return если срабртает это как break, ниже код читаться не будет
+		}
+		if (sex === "female") {
+			result.textContent = Math.round(
+				(447.6 + 9.2 * weight + 3.1 * height - 4.3 * age) * ratio
+			);
+			// для женщин тут пишем формулу по которой будет рассчитываться суточная калория
+		} else {
+			result.textContent = Math.round(
+				(88.36 + 13.4 * weight + 4.8 * height - 5.7 * age) * ratio
+			);
+			// для мужчин
+		}
+	}
+
+	calcTotal();
+
+
+
+	function initLocalSettings(selector, activeClass) {
+		const elements = document.querySelectorAll(selector);
+
+		elements.forEach((elem) => {
+			elem.classList.remove(activeClass);
+			if (elem.getAttribute("id") === localStorage.getItem("sex")) {
+				elem.classList.add(activeClass);
+			}
+			if (
+				elem.getAttribute("data-ratio") ===
+				localStorage.getItem("ratio")
+			) {
+				elem.classList.add(activeClass);
+			}
+		});
+	}
+
+	initLocalSettings("#gender div", "calculating__choose-item_active");
+	initLocalSettings(".calculating__choose_big div","calculating__choose-item_active");
+
+
+	function getStaticInformation(selector, activeClass) {
+		const elements = document.querySelectorAll(selector); 
+		//я буду получать все div с этого родитля
+
+		//отслеживаем клики по каждому элементу
+		elements.forEach((elem) => {
+			elem.addEventListener("click", (e) => {
+				if (e.target.getAttribute("data-ratio")) {
+
+					//если такой атрибут присутсвует у события
+					ratio = +e.target.getAttribute("data-ratio");
+					//если пользов кликнул например на низкую активность, мы вытаскиваем его активность стоящяя в data-ratio
+					//но если кликнем в sex то там это не будет работать, для него логика написана ниже
+
+					localStorage.setItem("ratio",+e.target.getAttribute("data-ratio"));
+					//уст в localStorage значение ratio
+
+				} else {
+
+					sex = e.target.getAttribute("id");
+					// получаем id - жен или муж
+					localStorage.setItem("sex", e.target.getAttribute("id"));
+					//уст в localStorage значение sex
+				}
+
+				elements.forEach((elem) => {
+					elem.classList.remove(activeClass);
+					// удаляем у всех div класс
+				});
+
+				e.target.classList.add(activeClass);
+				// доб класс по div которому кликнули
+
+				calcTotal();
+				//вызываем ф при изменениях пользователем найстроек калькулятора
+			});
+		});
+	}
+
+	getStaticInformation("#gender div", "calculating__choose-item_active");
+	getStaticInformation(".calculating__choose_big div","calculating__choose-item_active");
+
+	//ф обрабатывает каждый input
+	function getDynamicInformation(selector) {
+		const input = document.querySelector(selector);
+
+		input.addEventListener("input", () => {
+			//если input содержит не цифры, подсвечивает
+			if (input.value.match(/\D/g)) {
+				input.style.border = "1px solid red";
+			} else {
+				input.style.border = "none";
+			}
+			switch (input.getAttribute("id")) {
+				case "height":
+					height = +input.value;
+					break;
+				case "weight":
+					weight = +input.value;
+					break;
+				case "age":
+					age = +input.value;
+					break;
+			}
+
+			calcTotal();
+			//вызываем ф при изменениях
+		});
+	}
+
+	getDynamicInformation("#height");
+	getDynamicInformation("#weight");
+	getDynamicInformation("#age");
 });
