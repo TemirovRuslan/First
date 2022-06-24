@@ -8,7 +8,7 @@
 }
 
 a {
-    text-decoration: none
+    text-decoration: none  
 }
 
 .btn {
@@ -38,7 +38,7 @@ a {
 }
 
 .btn_min {
-    height: 50px
+    height: 50px;
 }
 
 .btn:hover {
@@ -733,4 +733,10 @@ a {
 	to {
 		opacity: 1;
 	}
+}
+.example-class-you-can-delete-it{
+   
+    animation-name: fade;
+    animation-duration: 1.5s;
+    
 }
